@@ -47,10 +47,10 @@ export async function GET(req: NextRequest) {
     });
 
     // Format output to match frontend structure
-    const formatted = quotations.map((q) => {
+    const formatted = quotations.map((q: any) => {
       const flatItems: any[] = [];
-      q.titles.forEach((t) => {
-        t.points.forEach((p) => {
+      q.titles.forEach((t: any) => {
+        t.points.forEach((p: any) => {
           flatItems.push({
             id: p.id,
             section: t.title,
@@ -189,8 +189,8 @@ export async function POST(req: NextRequest) {
 
     // 5. Format response to match frontend
     const flatItems: any[] = [];
-    quotation.titles.forEach((t) => {
-      t.points.forEach((p) => {
+    quotation.titles.forEach((t: any) => {
+      t.points.forEach((p: any) => {
         flatItems.push({
           id: p.id,
           section: t.title,
