@@ -38,8 +38,8 @@ export async function GET(
 
     // Format output
     const flatItems: any[] = [];
-    quotation.titles.forEach((t) => {
-      t.points.forEach((p) => {
+    quotation.titles.forEach((t: any) => {
+      t.points.forEach((p: any) => {
         flatItems.push({
           id: p.id,
           section: t.title,
@@ -138,8 +138,8 @@ export async function PUT(
 
     // Format output
     const flatItems: any[] = [];
-    updated.titles.forEach((t) => {
-      t.points.forEach((p) => {
+    updated.titles.forEach((t: any) => {
+      t.points.forEach((p: any) => {
         flatItems.push({
           id: p.id,
           section: t.title,

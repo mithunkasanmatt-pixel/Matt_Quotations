@@ -57,11 +57,11 @@ export async function POST(
         status: 'Draft',
         notes: original.notes,
         titles: {
-          create: original.titles.map((t, tIdx) => ({
+          create: original.titles.map((t: any, tIdx: number) => ({
             title: t.title,
             sortOrder: tIdx,
             points: {
-              create: t.points.map((p, pIdx) => ({
+              create: t.points.map((p: any, pIdx: number) => ({
                 content: p.content,
                 sortOrder: pIdx,
               })),

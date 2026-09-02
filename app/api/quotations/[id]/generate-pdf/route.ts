@@ -35,7 +35,7 @@ export async function GET(
 
     const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
       let totalPoints = 0;
-      quotation.titles.forEach((t) => (totalPoints += t.points.length));
+      quotation.titles.forEach((t: any) => (totalPoints += t.points.length));
       const isCompact = totalPoints > 15;
 
       const doc = new PDFDocument({
@@ -114,8 +114,8 @@ export async function GET(
       );
 
       // 4. TWO-COLUMN SCOPE GRID
-      const leftTitles = quotation.titles.filter((_, idx) => idx % 2 === 0);
-      const rightTitles = quotation.titles.filter((_, idx) => idx % 2 !== 0);
+      const leftTitles = quotation.titles.filter((_: any, idx: number) => idx % 2 === 0);
+      const rightTitles = quotation.titles.filter((_: any, idx: number) => idx % 2 !== 0);
 
       const gridStartY = briefY + 34;
       const colWidth = 250;
@@ -126,14 +126,14 @@ export async function GET(
       const titleFontSize = isCompact ? 6.8 : 7.5;
 
       let leftY = gridStartY + 4;
-      leftTitles.forEach((t) => {
+      leftTitles.forEach((t: any) => {
         doc.fillColor('#0f172a').fontSize(titleFontSize).font('Helvetica-Bold').text(t.title.toUpperCase(), leftMargin + 6, leftY, { width: colWidth });
         leftY = doc.y + 1;
         doc.strokeColor('#e2e8f0').lineWidth(0.5).moveTo(leftMargin + 6, leftY).lineTo(leftMargin + colWidth, leftY).stroke();
         leftY += 2;
 
         doc.fillColor('#334155').fontSize(pointFontSize).font('Helvetica');
-        t.points.forEach((p) => {
+        t.points.forEach((p: any) => {
           doc.text(`• ${p.content}`, leftMargin + 10, leftY, { width: colWidth - 6 });
           leftY = doc.y + (isCompact ? 0.3 : 1);
         });
@@ -141,14 +141,14 @@ export async function GET(
       });
 
       let rightY = gridStartY + 4;
-      rightTitles.forEach((t) => {
+      rightTitles.forEach((t: any) => {
         doc.fillColor('#0f172a').fontSize(titleFontSize).font('Helvetica-Bold').text(t.title.toUpperCase(), rightColX, rightY, { width: colWidth });
         rightY = doc.y + 1;
         doc.strokeColor('#e2e8f0').lineWidth(0.5).moveTo(rightColX, rightY).lineTo(rightColX + colWidth - 6, rightY).stroke();
         rightY += 2;
 
         doc.fillColor('#334155').fontSize(pointFontSize).font('Helvetica');
-        t.points.forEach((p) => {
+        t.points.forEach((p: any) => {
           doc.text(`• ${p.content}`, rightColX + 4, rightY, { width: colWidth - 10 });
           rightY = doc.y + (isCompact ? 0.3 : 1);
         });
