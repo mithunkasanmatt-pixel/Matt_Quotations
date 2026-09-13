@@ -14,7 +14,7 @@ import { useToast } from "@/components/ui/toast";
 import { ArrowLeft, Download, Mail, Printer, Edit, Copy, Check, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toJpeg } from "html-to-image";
+import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
 
 export default function QuotationPreviewPage({ params }: { params: Promise<{ id: string }> }) {
@@ -45,10 +45,11 @@ export default function QuotationPreviewPage({ params }: { params: Promise<{ id:
 
     setDownloading(true);
     try {
-      const imgData = await toJpeg(element, {
-        quality: 0.98,
+      const dataUrl = await toPng(element, {
+        quality: 1.0,
         pixelRatio: 2.5,
         backgroundColor: "#ffffff",
+        cacheBust: true,
       });
 
       const pdf = new jsPDF({
@@ -58,14 +59,30 @@ export default function QuotationPreviewPage({ params }: { params: Promise<{ id:
       });
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pageHeight = pdf.internal.pageSize.getHeight();
 
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+      const elementWidth = element.offsetWidth || 800;
+      const elementHeight = element.offsetHeight || 1050;
+      const imgHeight = (elementHeight * pdfWidth) / elementWidth;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, imgHeight, undefined, "FAST");
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = position - pageHeight;
+        pdf.addPage();
+        pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, imgHeight, undefined, "FAST");
+        heightLeft -= pageHeight;
+      }
+
       pdf.save(`Quotation_${quote?.quotation_number || id}.pdf`);
       toast("Success", "PDF downloaded successfully", "success");
     } catch (error: any) {
-      console.error("PDF generation error:", error);
-      window.open(`/api/quotations/${id}/generate-pdf`, "_blank");
+      console.error("PDF download error:", error);
+      toast("Error", error.message || "Failed to generate PDF download", "error");
     } finally {
       setDownloading(false);
     }
@@ -229,7 +246,7 @@ export default function QuotationPreviewPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
               <div className="text-right text-[10px] leading-normal text-slate-500">
-                <p>5th Floor, Pillars Gate, opposite Anna Stadium,</p>
+                <p>3rd Floor, Pillars Gate, opposite Anna Stadium,</p>
                 <p>Vadasery Nagercoil, Kanyakumari,</p>
                 <p>Tamil Nadu 629001.</p>
               </div>
@@ -339,6 +356,12 @@ export default function QuotationPreviewPage({ params }: { params: Promise<{ id:
                 </p>
               </div>
               <div>
+                <h4 className="font-bold text-slate-950">Phase Scope & Milestones:</h4>
+                <p className="text-slate-600 mt-0.5 leading-relaxed">
+                  All the features mentioned in this quotation are included in <strong className="text-slate-900 font-semibold">Phase 1</strong>. Any new features requested after this phase will be considered <strong className="text-slate-900 font-semibold">Phase 2</strong> and will be developed separately. No new features will be added during Phase 1 until all the features listed in this quotation are fully completed.
+                </p>
+              </div>
+              <div>
                 <h4 className="font-bold text-slate-950">NDA:</h4>
                 <p className="text-slate-600 mt-0.5">Non-disclosure agreement can be signed for confidentiality.</p>
               </div>
@@ -364,7 +387,7 @@ export default function QuotationPreviewPage({ params }: { params: Promise<{ id:
 
             {/* 8. FOOTER */}
             <div className="mt-10 pt-4 border-t border-slate-100 text-center text-[10px] text-slate-400">
-              Date: {quote.quotation_date ? new Date(quote.quotation_date).toLocaleDateString('en-GB') : ""} | Place: {quote.place} | Mob: 7505197855 | Web: mattengineeringsolutions.com
+              Date: {quote.quotation_date ? new Date(quote.quotation_date).toLocaleDateString('en-GB') : ""} | Place: {quote.place} | Mob: 7305197833 | Web: mattengineeringsolutions.com
             </div>
 
           </div>
