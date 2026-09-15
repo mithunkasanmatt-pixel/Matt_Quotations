@@ -65,9 +65,13 @@ model Quotation {
   validUntil      DateTime @map("valid_until")
   status          String   @default("Generated")
   notes           String?
+  phase           String   @default("Phase 1")
+  parentQuotationId Int?     @map("parent_quotation_id")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
+  parentQuotation Quotation?  @relation("QuotationPhaseHistory", fields: [parentQuotationId], references: [id], onDelete: SetNull)
+  childQuotations Quotation[] @relation("QuotationPhaseHistory")
   titles          QuotationTitle[]
 
   @@map("quotations")

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   FileText, 
+  Receipt,
   Settings, 
   LogOut,
   X
@@ -24,6 +25,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const navItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Quotations", href: "/quotations", icon: FileText },
+    { label: "Generate Invoice", href: "/invoices", icon: Receipt },
     { label: "Settings", href: "/settings", icon: Settings },
   ];
 

@@ -16,11 +16,16 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const status = searchParams.get('status') || '';
+    const phase = searchParams.get('phase') || '';
 
     const whereClause: any = {};
 
     if (status) {
       whereClause.status = status;
+    }
+
+    if (phase) {
+      whereClause.phase = phase;
     }
 
     if (search) {
@@ -83,6 +88,8 @@ export async function GET(req: NextRequest) {
         valid_until: q.validUntil.toISOString().split('T')[0],
         status: q.status,
         notes: q.notes,
+        phase: q.phase || 'Phase 1',
+        parent_quotation_id: q.parentQuotationId || null,
         currency: 'INR',
         created_at: q.createdAt.toISOString(),
         items: flatItems,
@@ -122,6 +129,8 @@ export async function POST(req: NextRequest) {
       amount,
       titles,
       notes,
+      phase,
+      parent_quotation_id,
     } = await req.json();
 
     if (!client_name || !place || !sir_madam || !quotation_title || !technology || !duration || amount === undefined) {
@@ -152,6 +161,8 @@ export async function POST(req: NextRequest) {
         validUntil,
         status: 'Generated',
         notes: notes || '',
+        phase: phase || 'Phase 1',
+        parentQuotationId: parent_quotation_id ? Number(parent_quotation_id) : null,
         titles: {
           create: (titles || []).map((t: any, tIdx: number) => ({
             title: t.title,
@@ -181,7 +192,7 @@ export async function POST(req: NextRequest) {
     await prisma.activityLog.create({
       data: {
         action: 'Quotation Created',
-        description: `Quotation ${quotationNumber} for client ${client_name} was created.`,
+        description: `Quotation ${quotationNumber} (${quotation.phase}) for client ${client_name} was created.`,
         userId: authUser.userId,
         userName: authUser.name,
       },
@@ -223,6 +234,8 @@ export async function POST(req: NextRequest) {
       valid_until: quotation.validUntil.toISOString().split('T')[0],
       status: quotation.status,
       notes: quotation.notes,
+      phase: quotation.phase || 'Phase 1',
+      parent_quotation_id: quotation.parentQuotationId || null,
       currency: 'INR',
       created_at: quotation.createdAt.toISOString(),
       items: flatItems,

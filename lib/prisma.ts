@@ -18,7 +18,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 const adapter = new PrismaPg(pool);
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+export const prisma = process.env.NODE_ENV === 'production' 
+  ? (globalForPrisma.prisma ?? new PrismaClient({ adapter })) 
+  : new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;

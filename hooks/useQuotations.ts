@@ -54,6 +54,8 @@ export interface QuotationData {
   currency: string;
   status?: string;
   notes?: string;
+  phase?: string;
+  parent_quotation_id?: number | null;
   created_by?: number;
   created_by_name?: string;
   created_at?: string;
@@ -66,13 +68,14 @@ export function useQuotations() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const { toast } = useToast();
 
-  const fetchQuotations = React.useCallback(async (filters: { search?: string; status?: string; client_id?: string } = {}) => {
+  const fetchQuotations = React.useCallback(async (filters: { search?: string; status?: string; client_id?: string; phase?: string } = {}) => {
     setLoading(true);
-    const { search = "", status = "", client_id = "" } = filters;
+    const { search = "", status = "", client_id = "", phase = "" } = filters;
     const queryParams = new URLSearchParams();
     if (search) queryParams.append("search", search);
     if (status) queryParams.append("status", status);
     if (client_id) queryParams.append("client_id", client_id);
+    if (phase) queryParams.append("phase", phase);
 
     const res = await apiFetch(`/quotations?${queryParams.toString()}`);
     if (res.success && res.data) {
