@@ -14,8 +14,6 @@ import { useToast } from "@/components/ui/toast";
 import { ArrowLeft, Download, Mail, Printer, Edit, Copy, Check, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toPng } from "html-to-image";
-import jsPDF from "jspdf";
 
 export default function QuotationPreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -40,46 +38,9 @@ export default function QuotationPreviewPage({ params }: { params: Promise<{ id:
   const [emailBody, setEmailBody] = React.useState<string>("");
 
   const handleDownloadPdf = async () => {
-    const element = document.getElementById("quotation-print-container");
-    if (!element) return;
-
     setDownloading(true);
     try {
-      const dataUrl = await toPng(element, {
-        quality: 1.0,
-        pixelRatio: 2.5,
-        backgroundColor: "#ffffff",
-        cacheBust: true,
-      });
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const elementWidth = element.offsetWidth || 800;
-      const elementHeight = element.offsetHeight || 1050;
-      const imgHeight = (elementHeight * pdfWidth) / elementWidth;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, imgHeight, undefined, "FAST");
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = position - pageHeight;
-        pdf.addPage();
-        pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, imgHeight, undefined, "FAST");
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`Quotation_${quote?.quotation_number || id}.pdf`);
-      toast("Success", "PDF downloaded successfully", "success");
+      await downloadQuotationPdf(quotationId, quote?.quotation_number || id);
     } catch (error: any) {
       console.error("PDF download error:", error);
       toast("Error", error.message || "Failed to generate PDF download", "error");
